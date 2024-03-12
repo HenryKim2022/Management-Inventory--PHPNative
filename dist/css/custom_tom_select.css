@@ -1,0 +1,55 @@
+@charset "UTF-8";
+
+@media (pointer: fine) and (hover: hover) {
+    .ts-dropdown .ts-dropdown-content {
+        overflow-y: hidden;
+    }
+
+    .ts-dropdown .ts-dropdown-content:hover {
+        overflow-y: overlay;
+    }
+}
+
+.custom-tom-select {
+    display: inline-block;
+    vertical-align: top;
+    width: 100%;
+    padding: 7.5px 7.5px 3.75px;
+    border: 1px solid #ddd;
+    border-radius: 4.5px;
+    font-size: 14px;
+    min-height: 44px;
+
+}
+
+.ts-control {
+    border: 0px;
+}
+
+.ts-wrapper:not(.form-control, .form-select).single .ts-control {
+    background-image: url('/dist/assets/icon/bottom_arrow.svg');
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 16px 12px;
+}
+
+.ts-dropdown {
+    background-color: #f9f9f9;
+}
+
+.ts-dropdown [data-selectable].option {
+    height: 6.5vh;
+}
+
+
+.ts-dropdown-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ts-dropdown-content::-webkit-scrollbar-track {
+    background-color: #f9f9f9;
+}
+
+.ts-dropdown-content::-webkit-scrollbar-thumb {
+    background-color: #6c757d;
+}

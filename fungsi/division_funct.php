@@ -1,0 +1,174 @@
+<?php
+require_once(__DIR__ . '/../layouts/set_title.php');
+require_once(__DIR__ . '/../fungsi/koneksi.php');
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// <!-- QUERY ADD PARTS -->
+if (isset($_POST['btnAddNewDiv'])) {
+    $tbPgref = 'mg_div.php';
+    $tbTxtref = 'Division';
+
+    $nama_id = $_POST['addDivName'];
+    $check = mysqli_query(
+        $conn,
+        "SELECT * FROM tb_divisi WHERE nama_div = '$nama_id';"
+    );
+
+
+    if ($nama_id != '') {
+        ///////// If there is a record, display an alert 
+        if (mysqli_num_rows($check) > 0) {
+            unset($_SESSION["toastMessages"]);
+            $toastMessages = array(
+                "code_yellow",
+                "Data $tbTxtref($nama_id) already exists!"
+            );
+            processIt($tbPgref, $toastMessages);
+        } else {
+            $result = mysqli_query(
+                $conn,
+                "INSERT INTO tb_divisi(nama_div)
+                    VALUES ('$nama_id');"
+            );
+            if (mysqli_affected_rows($conn) > 0) {
+                unset($_SESSION["toastMessages"]);
+                $toastMessages = array(
+                    "code_green",
+                    "Data $tbTxtref($nama_id) added successfully :)"
+                );
+                processIt($tbPgref, $toastMessages);
+            } else {
+                unset($_SESSION["toastMessages"]);
+                $toastMessages = array(
+                    "code_red",
+                    "Err: Failed to add Data $tbTxtref($nama_id) :("
+                );
+                processIt($tbPgref, $toastMessages);
+            }
+        }
+        ///////
+    } else {
+        unset($_SESSION["toastMessages"]);
+        $toastMessages = array(
+            "code_yellow",
+            "Plz fill $tbTxtref Name field before saving :("
+        );
+        processIt($tbPgref, $toastMessages);
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+// <!-- QUERY DEL DIVISION -->
+if (isset($_GET['divid']) != 0) {
+    $tbPgref = 'mg_div.php';
+    $tbTxtref = 'Division';
+
+    $div_id = $_GET['divid'];
+
+
+    $getDivName =  mysqli_query(     //// Check Division Name by $div_id
+        $conn,
+        "SELECT nama_div FROM tb_divisi WHERE id_divisi = '$div_id'"
+    );
+    $data = mysqli_fetch_all($getDivName, MYSQLI_ASSOC);
+    $nama_div = $data[0]['nama_div'];
+
+    if ($getDivName) {
+        $isUsed = mysqli_query(     //// Check if in tb_pegawai id_divisi exist (linked)
+            $conn,
+            "SELECT id_divisi FROM tb_pegawai WHERE id_divisi = '$div_id'"
+        );
+
+        if (mysqli_affected_rows($conn) > 0) {
+            unset($_SESSION["toastMessages"]);
+            $toastMessages = array(
+                "code_red",
+                "Failed to delete Data $tbTxtref($nama_div). Division($nama_div) is associated with tb_pegawai table!"
+            );
+            processIt($tbPgref, $toastMessages);
+            ////
+        } else {
+            $deleteQuery = "DELETE FROM tb_divisi WHERE id_divisi = '$div_id'";
+            if (mysqli_query($conn, $deleteQuery)) {
+                unset($_SESSION["toastMessages"]);
+                $toastMessages = array(
+                    "code_green",
+                    "$tbTxtref($nama_div) successfully deleted :)"
+                );
+                processIt($tbPgref, $toastMessages);
+                ////
+            } else {
+                echo "Error deleting Division name: " . mysqli_error($conn);
+                unset($_SESSION["toastMessages"]);
+                $toastMessages = array(
+                    "code_red",
+                    "Err: Failed to delete Data $tbTxtref($nama_div) >" . mysqli_error($conn)
+                );
+                processIt($tbPgref, $toastMessages);
+            }
+        }
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////   CORE   //////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+class PBO
+{
+    public function setSessionValuesAndRedirect($tbPgref, $toastMessages)
+    {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (isset($toastMessages) && is_array($toastMessages)) {
+            $_SESSION['toastMessages'] = $toastMessages;
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+
+function processIt($tbPgref, $toastMessages)
+{
+    $pbo = new PBO();
+    $result = $pbo->setSessionValuesAndRedirect($tbPgref, $toastMessages);
+
+    if ($result === true) {
+        echo "<script>console.log('$tbPgref');</script>";
+        // echo "<script>window.location.href = 'mg_st.php';</script>";
+        echo "<script>window.location.href = '" . dirname($_SERVER['PHP_SELF']) . "/../" . $tbPgref . "';</script>";
+    } elseif ($result === false) {
+        echo "<script>console.log('Invalid Data !');</script>";
+        // echo "<script>window.location.href = '" . dirname($_SERVER['PHP_SELF']) . "/../" . $tbPgref . "';</script>";
+    }
+}
