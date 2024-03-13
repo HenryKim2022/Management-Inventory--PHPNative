@@ -1,4 +1,4 @@
 # NOTE:
-Edit Query not continued (posponed until unkown times).
+Edit Query dis-continued (posponed until unkown times).
 
 Im Prioritize urgent thing :)
